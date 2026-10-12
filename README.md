@@ -10,8 +10,9 @@ Hay una aplicacion funcional, ya conectada a un proyecto Supabase real (`Examene
 - Autoregistro: cualquiera crea su propia cuenta (nombre, apellido, fecha de nacimiento, categoria, usuario y contrasena) sin intervencion de un admin.
 - Panel principal con las categorias de edad y los tests de la categoria del participante.
 - Flujo de examen: preguntas V/F, respuesta unica y respuesta multiple, entrega y correccion en el servidor (`submit_attempt`), un intento por test.
-- En el registro cada participante elige su categoria de edad; el nivel del examen (facil, medio o dificil) se calcula automaticamente a partir de la categoria (nunca lo elige el usuario) segun un mapeo fijo. El aviso de edad/categoria sigue siendo informativo.
-- Clasificaciones: por test, acumulada por categoria y general, cada una accesible desde el menu principal.
+- Tras entregar (o al volver a abrir un test ya completado), el participante ve una revision pregunta a pregunta: su respuesta, la respuesta correcta y si acerto o fallo (`get_attempt_review`).
+- En el registro cada participante elige su categoria de edad; el nivel del examen (facil, medio o dificil) se calcula automaticamente a partir de la categoria (nunca lo elige el usuario) segun un mapeo fijo. El aviso de edad solo se muestra para las categorias que son edades reales (`18-35`, `+35`); las demas son clases/niveles del profesor, no edades.
+- Clasificaciones: por test, acumulada por categoria y general (esta ultima muestra a todos los participantes de todas las categorias, sin filtrar por nivel), cada una accesible desde el menu principal.
 - Esquema SQL completo con RLS y funciones de correccion server-side en `supabase/migrations`.
 
 Falta: alta de usuarios/categorias/tests reales del profesor (solo hay 2 usuarios y 1 test de prueba) y despliegue verificado en GitHub Pages.

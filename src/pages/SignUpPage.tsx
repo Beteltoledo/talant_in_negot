@@ -35,12 +35,13 @@ function SignUpPage() {
     if (!birthDate || !categoryId) return null
     const category = categories.find((c) => c.id === categoryId)
     if (!category) return null
+    // 2-3, 4-5, 6-7, 8-9 and 10-11 are class/grade groupings, not real age
+    // ranges, so comparing the declared birth date against them is meaningless;
+    // only warn for the real age categories (18-35, +35).
+    if (!categoryIsRealAge(category.min_age)) return null
     const age = calculateAge(birthDate)
     if (age < category.min_age || age > category.max_age) {
-      const rangeLabel = categoryIsRealAge(category.min_age)
-        ? `${category.min_age}-${category.max_age} años`
-        : `${category.min_age}-${category.max_age}`
-      return `Aviso: la edad introducida (${age} años) no coincide con el rango habitual de "${category.name}" (${rangeLabel}). Puedes continuar igualmente.`
+      return `Aviso: la edad introducida (${age} años) no coincide con el rango habitual de "${category.name}" (${category.min_age}-${category.max_age} años). Puedes continuar igualmente.`
     }
     return null
   }, [birthDate, categoryId, categories])

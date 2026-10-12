@@ -50,14 +50,13 @@ function RankingsPage() {
   }, [profile])
 
   useEffect(() => {
-    if (!supabase || !profile) return
+    if (!supabase) return
     supabase
       .from('general_rankings')
       .select('*')
-      .eq('difficulty', profile.difficulty)
       .order('rank')
       .then(({ data }) => setGeneralRanking(data ?? []))
-  }, [profile])
+  }, [])
 
   return (
     <>

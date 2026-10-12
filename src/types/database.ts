@@ -65,6 +65,19 @@ export interface AttemptAnswer {
   is_correct: boolean
 }
 
+/** Row returned by get_attempt_review(): one graded question with the
+ * participant's answer and the correct answer, for post-submission review. */
+export interface AttemptReviewRow {
+  question_id: string
+  position: number
+  question_type: QuestionType
+  prompt: string
+  options: QuestionOption[]
+  correct_options: string[]
+  selected_options: string[]
+  is_correct: boolean
+}
+
 export interface TestRankingRow {
   test_id: string
   user_id: string
@@ -125,6 +138,10 @@ export interface Database {
       current_exam_difficulty: {
         Args: Record<string, never>
         Returns: ExamDifficulty
+      }
+      get_attempt_review: {
+        Args: { p_attempt_id: string }
+        Returns: AttemptReviewRow[]
       }
     }
   }

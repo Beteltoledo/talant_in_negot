@@ -42,6 +42,16 @@ h1 { max-width: 600px; margin-bottom: 18px; color: #202c2c; font-size: clamp(42p
 
 .result-panel { padding: 60px 0; }
 .result-panel h2 { margin-bottom: 10px; }
+.review-list { display: flex; flex-direction: column; gap: 24px; margin-top: 40px; }
+.review-card { border-top: 1px solid #d8d1c4; padding-top: 20px; }
+.review-card.review-correct .question-index { color: #4f7f6b; }
+.review-card.review-incorrect .question-index { color: #b3352a; }
+.review-option { justify-content: space-between; cursor: default; }
+.review-option-correct { border-color: #4f7f6b; background: #eaf1ec; }
+.review-option-wrong { border-color: #b3352a; background: #f7e9e7; }
+.review-tag { margin-left: auto; padding-left: 10px; color: #68706b; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+.review-tag-correct { color: #4f7f6b; }
+.review-option-wrong .review-tag:first-of-type { color: #b3352a; }
 
 .test-runner { display: flex; flex-direction: column; gap: 24px; padding: 20px 0 60px; }
 .question-card { border-top: 1px solid #d8d1c4; padding-top: 20px; }
