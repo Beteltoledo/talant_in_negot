@@ -1,30 +1,50 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
-import type { CategoryRankingRow, GeneralRankingRow, Test, TestRankingRow } from '../types/database'
+import { difficultyForMinAge } from '../lib/age'
+import type { AgeCategory, CategoryRankingRow, GeneralRankingRow, RankableTest, TestRankingRow } from '../types/database'
 
 type Tab = 'test' | 'categoria' | 'general'
 
 function RankingsPage() {
   const { profile } = useAuth()
   const [tab, setTab] = useState<Tab>('test')
-  const [tests, setTests] = useState<Test[]>([])
+  const [tests, setTests] = useState<RankableTest[]>([])
   const [selectedTest, setSelectedTest] = useState('')
   const [testRanking, setTestRanking] = useState<TestRankingRow[]>([])
+  const [categories, setCategories] = useState<AgeCategory[]>([])
+  const [selectedCategoryId, setSelectedCategoryId] = useState('')
   const [categoryRanking, setCategoryRanking] = useState<CategoryRankingRow[]>([])
   const [generalRanking, setGeneralRanking] = useState<GeneralRankingRow[]>([])
 
+  // "Por test" and "Acumulada por categoria" let a participant browse every
+  // class, not just their own: test-taking access stays restricted by RLS,
+  // but results/rankings across classes are not sensitive.
   useEffect(() => {
-    if (!supabase || !profile) return
+    if (!supabase) return
     supabase
-      .from('tests')
+      .from('rankable_tests')
       .select('*')
-      .eq('category_id', profile.category_id)
-      .eq('difficulty', profile.difficulty)
-      .order('created_at')
+      .order('category_name')
       .then(({ data }) => {
         setTests(data ?? [])
-        setSelectedTest((current) => current || data?.[0]?.id || '')
+        setSelectedTest((current) => {
+          if (current) return current
+          const ownTest = data?.find((t) => t.category_id === profile?.category_id)
+          return ownTest?.id ?? data?.[0]?.id ?? ''
+        })
+      })
+  }, [profile])
+
+  useEffect(() => {
+    if (!supabase) return
+    supabase
+      .from('age_categories')
+      .select('*')
+      .order('min_age')
+      .then(({ data }) => {
+        setCategories(data ?? [])
+        setSelectedCategoryId((current) => current || profile?.category_id || data?.[0]?.id || '')
       })
   }, [profile])
 
@@ -39,15 +59,17 @@ function RankingsPage() {
   }, [selectedTest])
 
   useEffect(() => {
-    if (!supabase || !profile) return
+    if (!supabase || !selectedCategoryId) return
+    const category = categories.find((c) => c.id === selectedCategoryId)
+    if (!category) return
     supabase
       .from('category_rankings')
       .select('*')
-      .eq('category_id', profile.category_id)
-      .eq('difficulty', profile.difficulty)
+      .eq('category_id', selectedCategoryId)
+      .eq('difficulty', difficultyForMinAge(category.min_age))
       .order('rank')
       .then(({ data }) => setCategoryRanking(data ?? []))
-  }, [profile])
+  }, [selectedCategoryId, categories])
 
   useEffect(() => {
     if (!supabase) return
@@ -83,7 +105,7 @@ function RankingsPage() {
         <article className="ranking-panel">
           <select value={selectedTest} onChange={(event) => setSelectedTest(event.target.value)}>
             {tests.map((test) => (
-              <option key={test.id} value={test.id}>{test.title}</option>
+              <option key={test.id} value={test.id}>{test.category_name} - {test.title}</option>
             ))}
           </select>
           <div className="ranking-list">
@@ -101,6 +123,11 @@ function RankingsPage() {
 
       {tab === 'categoria' && (
         <article className="ranking-panel">
+          <select value={selectedCategoryId} onChange={(event) => setSelectedCategoryId(event.target.value)}>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>{category.name}</option>
+            ))}
+          </select>
           <div className="ranking-list">
             {categoryRanking.map((row) => (
               <div className="ranking-row" key={row.user_id}>
@@ -112,7 +139,7 @@ function RankingsPage() {
                 <strong className="score">{row.total_score}</strong>
               </div>
             ))}
-            {categoryRanking.length === 0 && <p>Todavia no hay resultados en tu categoria.</p>}
+            {categoryRanking.length === 0 && <p>Todavia no hay resultados en esta categoria.</p>}
           </div>
         </article>
       )}
@@ -139,3 +166,4 @@ function RankingsPage() {
 }
 
 export default RankingsPage
+

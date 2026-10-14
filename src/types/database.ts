@@ -78,6 +78,17 @@ export interface AttemptReviewRow {
   is_correct: boolean
 }
 
+/** Row from rankable_tests: lets the rankings UI list tests across every
+ * class/difficulty, bypassing the RLS that otherwise scopes `tests` to the
+ * viewer's own category (that RLS still protects exam-taking access). */
+export interface RankableTest {
+  id: string
+  title: string
+  category_id: string
+  category_name: string
+  difficulty: ExamDifficulty
+}
+
 export interface TestRankingRow {
   test_id: string
   user_id: string
@@ -125,6 +136,7 @@ export interface Database {
       test_rankings: { Row: TestRankingRow }
       category_rankings: { Row: CategoryRankingRow }
       general_rankings: { Row: GeneralRankingRow }
+      rankable_tests: { Row: RankableTest }
     }
     Functions: {
       submit_attempt: {

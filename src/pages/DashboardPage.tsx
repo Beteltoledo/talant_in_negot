@@ -71,7 +71,9 @@ function DashboardPage() {
                       <li key={test.id}>
                         <span>{test.title} ({DIFFICULTY_LABELS[test.difficulty]})</span>
                         {attempt ? (
-                          <span className="test-done">Completado - {attempt.score}%</span>
+                          <Link to={`/tests/${test.id}`} className="test-done">
+                            Completado - {attempt.score}% (ver respuestas)
+                          </Link>
                         ) : (
                           <Link to={`/tests/${test.id}`}>Abrir examen -&gt;</Link>
                         )}
