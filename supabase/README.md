@@ -2,7 +2,7 @@
 
 Aqui viven las migraciones SQL y las funciones necesarias para el backend.
 
-Proyecto conectado: **Examenes** (organizacion `Anzi`, ref `sdkacefvpppvufkfzolb`, region `eu-west-1`). La URL y la clave publica ya estan en `.env.local` (no versionado); para volver a vincular la CLI usa `supabase link --project-ref sdkacefvpppvufkfzolb` con un access token de cuenta (`supabase login` o `SUPABASE_ACCESS_TOKEN`).
+Proyecto conectado: **talant-in-negot** (organizacion `Anzi`, ref `puldaptkbrqpjzcddity`, region `eu-west-1`) — proyecto de **produccion**, separado del proyecto de pruebas (`Examenes`, ref `sdkacefvpppvufkfzolb`, usado por el repo `cristian-anAI/web-examenes-rafa`). Son dos bases de datos totalmente independientes; no comparten usuarios, intentos ni contenido. La URL y la clave publica de produccion ya estan en `.env.local` (no versionado); para volver a vincular la CLI usa `supabase link --project-ref puldaptkbrqpjzcddity` con un access token de cuenta (`supabase login` o `SUPABASE_ACCESS_TOKEN`).
 
 ## Migraciones
 
@@ -23,8 +23,29 @@ Aplicar en orden con `supabase db push` o pegando el contenido en el SQL editor 
 
 `seed/` guarda el SQL generado por `scripts/import-questions.mjs` a partir de un CSV con el formato de `content/plantilla_preguntas.csv` (categorias que falten + `tests` + `questions`). Se aplica despues de todas las migraciones. Ver la seccion "De la plantilla al SQL" del README principal para el comando exacto.
 
-- `ejemplo_1_samuel_1.sql` - "1 Samuel - Capitolul 1", categorias `2-3` y `8-9`, 13 preguntas, sin nivel (nivel por defecto `facil`).
-- `samuel_capitolul_1_2.sql` - "1 Samuel - Capitolul 1-2", las 7 categorias de edad, 25 preguntas cada una (175 en total), cada una con el nivel que le corresponde por el mapeo fijo.
+- `ejemplo_1_samuel_1.sql` - "1 Samuel - Capitolul 1", categorias `2-3` y `8-9`, 13 preguntas, sin nivel (nivel por defecto `facil`). **No cargado** en el proyecto de produccion (`talant-in-negot`); solo existe en el proyecto de pruebas.
+- `samuel_capitolul_1_2.sql` - "1 Samuel - Capitolul 1-2", las 7 categorias de edad, 25 preguntas cada una (175 en total), cada una con el nivel que le corresponde por el mapeo fijo. **Cargado en produccion** a peticion explicita (es contenido real, no de prueba).
+
+### Como borrar el examen de Samuel de produccion (si hiciera falta)
+
+El profesor pidio dejar documentado como quitar este contenido si algun dia ya no se quiere en produccion. Ejecuta esto en el SQL editor del proyecto `talant-in-negot` (o con `supabase db query --linked "..."`):
+
+```sql
+-- Borra las 7 variantes del examen (una por categoria) y sus preguntas
+-- (questions tiene "on delete cascade" desde tests, asi que basta con borrar tests).
+-- Si ya hay intentos reales de alumnos sobre este examen, bórralos solo si
+-- estás seguro: test_attempts/attempt_answers tambien se borran en cascada.
+delete from public.tests where title = '1 Samuel - Capitolul 1-2';
+```
+
+Para comprobar antes cuantos intentos de alumnos se perderian:
+
+```sql
+select count(*) from public.test_attempts a
+join public.tests t on t.id = a.test_id
+where t.title = '1 Samuel - Capitolul 1-2';
+```
+
 
 ## Decisiones tomadas
 
@@ -40,4 +61,5 @@ Aplicar en orden con `supabase db push` o pegando el contenido en el SQL editor 
 
 - Decidir si se ocultan las clasificaciones mientras un test sigue abierto (`tests.ends_at`).
 - El autoregistro abierto permite que una misma persona cree varias cuentas con distinto usuario para repetir un test que solo permite un intento; no hay control contra esto todavia (p. ej. deduplicar por nombre+apellido+fecha de nacimiento).
-- Cargar mas contenido real de preguntas por categoria (hoy esta 1 Samuel 1 y 1 Samuel 1-2).
+- Cargar mas contenido real de preguntas por categoria (hoy esta 1 Samuel 1-2 en produccion).
+- El repo `cristian-anAI/web-examenes-rafa` (y su proyecto Supabase `Examenes`) quedan como entorno de pruebas; los cambios de codigo que apliquen tambien ahi deben aplicarse a mano (no hay sincronizacion automatica entre los dos repos).

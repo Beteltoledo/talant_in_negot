@@ -1,10 +1,12 @@
-# Web Examenes Rafa
+# Talant in Negot
 
 Aplicacion web para examenes teologicos de una iglesia, organizada por categorias de edad.
 
+Repositorio de **produccion**: [Beteltoledo/talant_in_negot](https://github.com/Beteltoledo/talant_in_negot), desplegado en https://beteltoledo.github.io/talant_in_negot/. El repo [cristian-anAI/web-examenes-rafa](https://github.com/cristian-anAI/web-examenes-rafa) queda como entorno de pruebas (otro proyecto Supabase, otros datos).
+
 ## Estado actual
 
-Hay una aplicacion funcional, ya conectada a un proyecto Supabase real (`Examenes`, org `Anzi`) con las migraciones y el contenido de ejemplo de 1 Samuel 1 cargados:
+Hay una aplicacion funcional, conectada a un proyecto Supabase de produccion (`talant-in-negot`, org `Anzi`) con las migraciones y el contenido de 1 Samuel 1-2 cargados, sin usuarios ni intentos de prueba:
 
 - Login con usuario/contrasena (mapeado a Supabase Auth con un email sintetico).
 - Autoregistro: cualquiera crea su propia cuenta (nombre, apellido, fecha de nacimiento, categoria, usuario y contrasena) sin intervencion de un admin.
@@ -16,7 +18,7 @@ Hay una aplicacion funcional, ya conectada a un proyecto Supabase real (`Examene
 - En el panel principal, un examen ya completado tiene un enlace ("ver respuestas") para volver a revisar el resultado y cada pregunta, incluidos examenes pasados.
 - Esquema SQL completo con RLS y funciones de correccion server-side en `supabase/migrations`.
 
-Falta: alta de usuarios/categorias/tests reales del profesor (solo hay 2 usuarios y 1 test de prueba) y despliegue verificado en GitHub Pages.
+Falta: dar de alta usuarios reales (hoy la base de produccion esta vacia de perfiles, listos para que los alumnos se autoregistren) y cargar mas contenido real de examenes cuando el profesor los entregue.
 
 ## Stack previsto
 
