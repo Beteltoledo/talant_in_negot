@@ -48,7 +48,7 @@ Falta: dar de alta usuarios reales (hoy la base de produccion esta vacia de perf
 
 - [x] Modelar preguntas de tipo verdadero/falso, respuesta unica y respuesta multiple.
 - [x] `scripts/import-questions.mjs` convierte la plantilla CSV en el SQL de `tests`/`questions` (ver "De la plantilla al SQL" mas arriba); falta la carga inicial real de contenido de cada categoria.
-- Adaptar los conversores DOCX/Excel existentes para producir el CSV de la plantilla (hoy la conversion PDF -> CSV se hizo a mano para `content/ejemplo_1_samuel_1.csv`).
+- Adaptar los conversores DOCX/Excel existentes para producir el CSV de la plantilla (hoy la conversion PDF -> CSV se ha hecho a mano para los examenes cargados; ver nota de seguridad sobre por que esos CSV no se suben al repo).
 - Validar que una pregunta multiple acepte exactamente las respuestas configuradas (el script ya valida letras de `correctas`, falta prueba end-to-end contra `submit_attempt`).
 
 ### Fase 4: Flujo del participante
@@ -102,27 +102,37 @@ El nivel del examen (`facil`, `medio` o `dificil`) lo asigna la app automaticame
 
 Nota: a pesar de llamarse "categorias de edad" (tabla `age_categories`), solo `18-35` y `+35` son edades reales. `2-3`, `4-5`, `6-7`, `8-9` y `10-11` son clases/niveles del profesor que casualmente usan el mismo formato de rango numerico; por eso la interfaz no les añade la palabra "años" (ver `categoryIsRealAge()` en `src/lib/age.ts`, que decide esto por `min_age >= 18`).
 
-Ejemplo real: [content/ejemplo_1_samuel_1.csv](content/ejemplo_1_samuel_1.csv) muestra como quedarian las preguntas de `Intrebari 1 Samuel 1.pdf` (categorias "2-3" y "8-9", preguntas de una sola respuesta) ya pasadas a la plantilla.
+Ejemplo de como queda una pregunta real ya pasada a la plantilla: ver el historial de commits o `content/plantilla_preguntas.csv` para el formato. Los CSV con contenido de examen real **no se suben al repo** (ver nota de seguridad mas abajo).
 
 Leyenda pensada para el profesor (que columnas rellenar, valores permitidos de `tipo`, errores comunes): [content/leyenda_plantilla.md](content/leyenda_plantilla.md).
+
+### Seguridad: nunca subir al repo CSV o SQL con respuestas reales
+
+Este repositorio es **publico** (requisito de GitHub Pages en el plan gratuito). Un CSV con la columna `correctas` rellena, o un SQL de `seed/` con `correct_options`, expone las respuestas correctas a cualquiera que navegue el repo en GitHub. Por eso `.gitignore` excluye `content/*.csv` (salvo `plantilla_preguntas.csv`, que es generico/de ejemplo) y `supabase/seed/*.sql`.
+
+Al cargar un examen real nuevo:
+1. Guarda el CSV del profesor en `content/` como siempre (para poder re-ejecutar el importador si hace falta), pero **no lo subas a git** — ya queda ignorado automaticamente.
+2. Ejecuta `npm run import:questions -- content/tu_examen.csv` para generar el SQL en `supabase/seed/` (tambien ignorado automaticamente).
+3. Aplica ese SQL directamente contra Supabase (`supabase db query --linked -f supabase/seed/tu_examen.sql` o pegandolo en el SQL editor). Nunca hace falta que el CSV ni el SQL lleguen a GitHub.
+4. Guarda una copia del CSV original en un sitio privado (no en este repo) por si se necesita reconstruir el examen mas adelante.
 
 ### De la plantilla al SQL
 
 `scripts/import-questions.mjs` convierte un CSV con el formato de la plantilla en el SQL de insercion (categorias que falten + `tests` + `questions`), listo para pegar en el SQL editor de Supabase o ejecutar con `psql`:
 
 ```bash
-npm run import:questions -- content/ejemplo_1_samuel_1.csv
-# genera supabase/seed/ejemplo_1_samuel_1.sql (tests publicados, is_published = true)
+npm run import:questions -- content/tu_examen.csv
+# genera supabase/seed/tu_examen.sql (tests publicados, is_published = true); ninguno de los dos se sube al repo
 
-npm run import:questions -- content/ejemplo_1_samuel_1.csv --draft
+npm run import:questions -- content/tu_examen.csv --draft
 # igual, pero con is_published = false para revisar antes de publicar
 ```
 
 El script valida el CSV (tipos reconocidos, letras de `correctas` que existen como opcion, niveles reconocidos y posiciones sin repetir dentro de cada test/categoria/nivel) y falla con un mensaje claro si algo no cuadra. Debe ejecutarse despues de aplicar las migraciones de `supabase/migrations`.
 
-El CSV original del profesor (categorias `usor`/`mediu`/`avansat`, sin mapear a edades) se conserva como referencia en [content/ejemplo_1_samuel_1 - ejemplo_1_samuel_1.csv](content/ejemplo_1_samuel_1%20-%20ejemplo_1_samuel_1.csv); no se importa directamente. La version ya mapeada a categorias de edad y filtrada al mapeo fijo (una sola variante de nivel por categoria, 7 tests x 25 preguntas = 175) es [content/samuel_capitolul_1_2.csv](content/samuel_capitolul_1_2.csv). El SQL resultante esta en [supabase/seed/samuel_capitolul_1_2.sql](supabase/seed/samuel_capitolul_1_2.sql).
+El contenido real de "1 Samuel - Capitolul 1-2" (7 categorias de edad, 175 preguntas) ya esta cargado en el proyecto Supabase de produccion; el CSV y el SQL que lo generaron existen solo en local/Supabase, no en este repo (ver seccion de seguridad arriba). Ver `supabase/README.md` para como borrarlo si hiciera falta.
 
-Para publicarlo en Supabase, aplica primero las migraciones pendientes (incluidas `0006_exam_difficulty.sql` y `0007_auto_difficulty.sql`) y despues ejecuta el seed anterior en el SQL editor. Las migraciones agregan el nivel al perfil y al examen, lo calculan automaticamente por categoria (nunca lo elige el participante), conservan el aviso por discrepancia de edad y separan las clasificaciones por nivel.
+Para publicar un examen nuevo en Supabase, aplica primero las migraciones pendientes y despues ejecuta el seed generado. Las migraciones agregan el nivel al perfil y al examen, lo calculan automaticamente por categoria (nunca lo elige el participante), conservan el aviso por discrepancia de edad y separan las clasificaciones por nivel.
 
 ## Desarrollo local
 

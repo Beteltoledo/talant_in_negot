@@ -23,8 +23,9 @@ Cada **fila** de la hoja es **una pregunta**. Estas son las columnas y qué se p
 
 ## Ejemplos ya rellenados
 
-- [plantilla_preguntas.csv](plantilla_preguntas.csv): un ejemplo corto con los tres tipos de pregunta.
-- [ejemplo_1_samuel_1.csv](ejemplo_1_samuel_1.csv): el PDF real "1 Samuel, Capítulo 1" ya pasado a este formato.
+- [plantilla_preguntas.csv](plantilla_preguntas.csv): un ejemplo corto con los tres tipos de pregunta (sin respuestas reales de ningun alumno, es solo para ver el formato).
+
+Los examenes reales ya cargados (p. ej. "1 Samuel") no se guardan en este repositorio porque es publico y la columna `correctas` expondria las respuestas: se quedan solo en local y en Supabase. Ver la seccion de seguridad del README principal.
 
 ## Errores comunes a evitar
 

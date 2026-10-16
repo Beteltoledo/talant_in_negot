@@ -15,6 +15,18 @@ dist-ssr
 # Supabase CLI local cache (project ref, pooler host, etc. - regenerate with `supabase link`)
 supabase/.temp
 
+# Real exam content (answer keys in plain text) must never be committed to
+# this public repo, or anyone browsing GitHub could see the correct answers.
+# Keep real CSVs/generated seed SQL on disk locally only (or load them
+# straight into Supabase); only the generic plantilla/example stays tracked.
+/content/*.csv
+!/content/plantilla_preguntas.csv
+/supabase/seed/*.sql
+
+# Original exam source material from the professor (scanned worksheets, PDFs)
+# may contain answer keys too; keep these local/private, never in the public repo.
+*.pdf
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

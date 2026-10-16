@@ -23,6 +23,8 @@ Aplicar en orden con `supabase db push` o pegando el contenido en el SQL editor 
 
 `seed/` guarda el SQL generado por `scripts/import-questions.mjs` a partir de un CSV con el formato de `content/plantilla_preguntas.csv` (categorias que falten + `tests` + `questions`). Se aplica despues de todas las migraciones. Ver la seccion "De la plantilla al SQL" del README principal para el comando exacto.
 
+**Los archivos `seed/*.sql` con contenido de examenes reales no se suben a git** (ver `.gitignore` y la seccion de seguridad en el README principal): contienen `correct_options` en texto plano y este repo es publico. Siguen existiendo en local tras generarlos con el importador, solo que no se versionan.
+
 - `ejemplo_1_samuel_1.sql` - "1 Samuel - Capitolul 1", categorias `2-3` y `8-9`, 13 preguntas, sin nivel (nivel por defecto `facil`). **No cargado** en el proyecto de produccion (`talant-in-negot`); solo existe en el proyecto de pruebas.
 - `samuel_capitolul_1_2.sql` - "1 Samuel - Capitolul 1-2", las 7 categorias de edad, 25 preguntas cada una (175 en total), cada una con el nivel que le corresponde por el mapeo fijo. **Cargado en produccion** a peticion explicita (es contenido real, no de prueba).
 
