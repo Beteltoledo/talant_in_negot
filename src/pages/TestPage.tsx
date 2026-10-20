@@ -178,6 +178,9 @@ function TestPage() {
         <article className="question-card" key={question.id}>
           <p className="question-index">Pregunta {index + 1} de {questions.length}</p>
           <h3>{question.prompt}</h3>
+          {question.question_type === 'multiple_choice' && (
+            <p className="multiple-hint">Esta pregunta tiene varias respuestas posibles: marca todas las correctas.</p>
+          )}
           <div className="option-list">
             {question.options.map((option) => {
               const selected = (answers[question.id] ?? []).includes(option.id)

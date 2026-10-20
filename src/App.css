@@ -56,6 +56,7 @@ h1 { max-width: 600px; margin-bottom: 18px; color: #202c2c; font-size: clamp(42p
 .test-runner { display: flex; flex-direction: column; gap: 24px; padding: 20px 0 60px; }
 .question-card { border-top: 1px solid #d8d1c4; padding-top: 20px; }
 .question-index { color: #b35d45; font: 700 11px Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.multiple-hint { color: #8a4a1f; background: #fbeedd; border-left: 3px solid #b35d45; padding: 6px 10px; margin: 0 0 12px; font: 600 13px Arial, sans-serif; }
 .option-list { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
 .option-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #d8d1c4; cursor: pointer; font: 14px Arial, sans-serif; }
 .option-row.selected { border-color: #e6674b; background: #f5ece4; }
